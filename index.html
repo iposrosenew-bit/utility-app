@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b1f33">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ค่าสาธารณูปโภค">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>ค่าสาธารณูปโภค พล.รพศ.1</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0b1f33;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-tap-highlight-color:transparent}
+  iframe{border:0;width:100%;height:100%;display:block;background:#f1f5f9}
+  #splash{position:fixed;inset:0;background:linear-gradient(135deg,#0b1f33 0%,#12406b 55%,#1565c0 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:#fff;gap:16px;z-index:10;transition:opacity .5s ease}
+  #splash .lg{width:92px;height:92px;border-radius:26px;
+    background:linear-gradient(135deg,#f59e0b,#ef4444);display:grid;place-items:center;
+    font-size:46px;box-shadow:0 14px 38px rgba(245,158,11,.45);
+    animation:pop .6s cubic-bezier(.2,.9,.3,1.4)}
+  @keyframes pop{from{transform:scale(.5);opacity:0}}
+  #splash h1{font-size:19px;margin:0;font-weight:600;letter-spacing:.3px}
+  #splash p{font-size:13px;opacity:.72;margin:0}
+  .sp{width:28px;height:28px;border:3px solid rgba(255,255,255,.22);
+    border-top-color:#fff;border-radius:50%;animation:s .8s linear infinite;margin-top:8px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  #splash .ft{position:absolute;bottom:28px;font-size:11px;opacity:.45}
+  #off{position:fixed;inset:0;background:#0b1f33;color:#fff;display:none;
+    flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;z-index:20;padding:26px;text-align:center}
+  #off button{background:#1565c0;color:#fff;border:0;border-radius:11px;
+    padding:13px 28px;font-size:15px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="lg">⚡</div>
+  <h1>ค่าสาธารณูปโภค พล.รพศ.1</h1>
+  <p>ไฟฟ้า &amp; ประปา</p>
+  <div class="sp"></div>
+  <div class="ft">กำลังเชื่อมต่อระบบ…</div>
+</div>
+
+<!-- OFFLINE -->
+<div id="off">
+  <div style="font-size:54px">📡</div>
+  <h2 style="margin:0;font-size:18px">ไม่มีการเชื่อมต่ออินเทอร์เน็ต</h2>
+  <p style="opacity:.7;font-size:13px;margin:0;line-height:1.7">
+    ระบบต้องออนไลน์เพื่อดึงข้อมูลจาก Google Sheets<br>กรุณาเปิด Wi-Fi หรือเน็ตมือถือ</p>
+  <button onclick="location.reload()">🔄 ลองใหม่</button>
+</div>
+
+<!-- ⬇️⬇️⬇️ แก้ URL ในบรรทัดถัดไปเป็นของคุณ ⬇️⬇️⬇️ -->
+<iframe id="fr"
+  src="https://script.google.com/macros/s/AKfycbwN80bLwt4-5EK4EfOu3pcTXR7yBSD6hLmRz_TZJIl-M1HeHim7TT42an60RcUYEA71_Q/exec"
+  allow="clipboard-write; camera; fullscreen"></iframe>
+
+<script>
+  var fr = document.getElementById('fr');
+  var sp = document.getElementById('splash');
+  var done = false;
+
+  function hideSplash(){
+    if(done) return; done = true;
+    sp.style.opacity = '0';
+    setTimeout(function(){ sp.style.display = 'none'; }, 520);
+  }
+  fr.addEventListener('load', function(){ setTimeout(hideSplash, 900); });
+  setTimeout(hideSplash, 12000);   // กันค้าง ถ้าโหลดนานเกินไป
+
+  function chkNet(){
+    document.getElementById('off').style.display = navigator.onLine ? 'none' : 'flex';
+  }
+  window.addEventListener('online',  function(){ chkNet(); fr.src = fr.src; });
+  window.addEventListener('offline', chkNet);
+  chkNet();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js')
+        .then(function(r){ console.log('SW ok', r.scope); })
+        .catch(function(e){ console.warn('SW fail', e); });
+    });
+  }
+</script>
+</body>
+</html>
